@@ -1,0 +1,33 @@
+---
+
+- name: Gather OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+
+- name: Install Java
+  package:
+    name: "{{ JAVA }}"
+    state: present
+
+- name: Install unzip
+  package:
+    name: unzip
+    state: present
+
+- name: Download Trimmomatic
+  get_url:
+    url: "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-{{ VERSION }}.zip"
+    dest: "/home/{{ ATMOUSERNAME }}/trimmomatic.zip"
+
+- name: Unarchive FastQC
+  unarchive:
+    src: "/home/{{ ATMOUSERNAME }}/trimmomatic.zip"
+    dest: "/home/{{ ATMOUSERNAME }}"
+    remote_src: yes
+
+- name: Remove zip
+  file:
+    state: absent
+    path: "/home/{{ ATMOUSERNAME }}/trimmomatic.zip"
